@@ -1,20 +1,34 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-
-export default function App() {
+import { StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import ScannerScreen from "./screens/ScannerScreen";
+import ProfileScreen from "./screens/ProfileScreen";
+import { createStackNavigator } from "@react-navigation/stack";
+const stack = createStackNavigator();
+const App = () => {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <stack.Navigator screenOptions={{ animation: "fade_from_bottom" }}>
+        <stack.Screen
+          options={{ headerShown: false, title: "Mig Identity Verification" }}
+          name="scanner"
+          component={ScannerScreen}
+        />
+        <stack.Screen
+          options={{
+            // headerShown: false,
+            presentation: "modal",
+            // gestureEnabled: true,
+            // gestureDirection: "vertical",
+          }}
+          name="profile"
+          component={ProfileScreen}
+        />
+      </stack.Navigator>
+    </NavigationContainer>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
+
+const styles = StyleSheet.create({});
