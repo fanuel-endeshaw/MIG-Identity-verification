@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -18,7 +18,7 @@ export default function ScannerScreen() {
     if (scanned) return;
     setScanned(true);
     setLastScan(data);
-    navigation.navigate("profile", { data: data });
+    navigation.navigate("profile", { data: JSON.parse(data) });
 
     // Reset after short delay
     setTimeout(() => setScanned(false), 2000);
@@ -39,7 +39,15 @@ export default function ScannerScreen() {
 
       {/* Overlay */}
       <View style={styles.overlay} />
-
+      <View style={styles.header}>
+        <Image
+          style={{ height: 50, width: 50 }}
+          source={require("../assets/mig-icon.png")}
+        ></Image>
+        <Text style={{ fontSize: 22, fontWeight: "bold" }}>
+          Mig Identity Verification
+        </Text>
+      </View>
       {/* Scanner Frame */}
       <View style={styles.frame}>
         <View style={styles.cornerTL} />
@@ -80,6 +88,20 @@ export default function ScannerScreen() {
   );
 }
 const styles = StyleSheet.create({
+  header: {
+    width: "94%",
+    height: 60,
+    backgroundColor: "white",
+    position: "absolute",
+    top: 26,
+    alignItems: "center",
+    alignSelf: "center",
+    borderRadius: 7,
+    justifyContent: "center",
+    flexDirection: "row",
+    gap: 10,
+    // left: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: "black",
