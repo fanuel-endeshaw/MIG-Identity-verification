@@ -17,10 +17,11 @@ export default function ScannerScreen() {
   const handleScan = ({ data }) => {
     if (scanned) return;
     setScanned(true);
-    setLastScan(data);
+    // setLastScan(data);
+    console.log(typeof data);
+
     navigation.navigate("profile", { data: JSON.parse(data) });
 
-    // Reset after short delay
     setTimeout(() => setScanned(false), 2000);
   };
 
@@ -41,10 +42,11 @@ export default function ScannerScreen() {
       <View style={styles.overlay} />
       <View style={styles.header}>
         <Image
-          style={{ height: 50, width: 50 }}
-          source={require("../assets/mig-icon.png")}
+          style={{ height: 70, width: 70 }}
+          source={require("../assets/logo-full.png")}
+          resizeMode="contain"
         ></Image>
-        <Text style={{ fontSize: 22, fontWeight: "bold" }}>
+        <Text style={{ fontSize: 21, fontWeight: "bold" }}>
           Mig Identity Verification
         </Text>
       </View>
@@ -90,16 +92,19 @@ export default function ScannerScreen() {
 const styles = StyleSheet.create({
   header: {
     width: "94%",
-    height: 60,
+    width: "100%",
+    height: 100,
     backgroundColor: "white",
     position: "absolute",
-    top: 26,
+    // top: 26,
+    top: 0,
     alignItems: "center",
     alignSelf: "center",
     borderRadius: 7,
     justifyContent: "center",
     flexDirection: "row",
     gap: 10,
+    paddingTop: 20,
     // left: 10,
   },
   container: {

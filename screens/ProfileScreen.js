@@ -39,7 +39,7 @@ export default function ProfileScreen() {
         <View style={styles.infoContainer}>
           <DetailItem label="Full Name" value={data.name} />
           <DetailItem label="ID Number" value={data.id || "101"} />
-          <DetailItem label="Date of Birth" value={data.dob || "1985-07-22"} />
+          <DetailItem label="Date of Birth" value={data.dob || "2003-07-22"} />
           <DetailItem label="Address" value={data.address} />
         </View>
       </View>
@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     marginBottom: 10,
+    // backgroundColor: "white",
   },
   headerText: {
     fontSize: 20,

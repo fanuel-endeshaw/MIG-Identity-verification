@@ -17,14 +17,15 @@ const EMPLOYEES = [
     name: "Fanuel en",
     address: "Bole, Addis Ababa",
     phone: "+251900000000",
-    photo: "https://i.pravatar.cc/300",
+    photo:
+      "https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
   {
     id: "102",
     name: "abrham",
     address: "Bole, Addis Ababa",
     phone: "+251911111111",
-    photo: "https://i.pravatar.cc/301",
+    photo: "https://njaes.rutgers.edu/fs1325/FS1325-1-big.jpg",
   },
 ];
 
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#eeeeeeff",
     padding: 20,
-    paddingTop: 40,
+    paddingTop: 55,
     // justifyContent: "center",
   },
   header: {
