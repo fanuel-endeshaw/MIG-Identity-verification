@@ -6,23 +6,26 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { Ionicons } from "@expo/vector-icons";
 
-// Mock Database - Replace this with your actual API or Database fetch
 const EMPLOYEES = [
   {
     id: "101",
-    name: "Fanuel en",
+    name: "Fanuel En",
     address: "Bole, Addis Ababa",
     phone: "+251900000000",
     photo:
-      "https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?q=80&w=387&auto=format&fit=crop",
   },
   {
     id: "102",
-    name: "abrham",
+    name: "Abrham",
     address: "Bole, Addis Ababa",
     phone: "+251911111111",
     photo: "https://njaes.rutgers.edu/fs1325/FS1325-1-big.jpg",
@@ -31,97 +34,183 @@ const EMPLOYEES = [
 
 export default function Search() {
   const [searchId, setSearchId] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
   const navigation = useNavigation();
 
   const handleSearch = () => {
-    // 1. Basic validation for empty input
-    if (!searchId.trim()) {
-      Alert.alert("Error", "Please enter an Employee ID");
+    const trimmedId = searchId.trim();
+    if (!trimmedId) {
+      Alert.alert(
+        "Input Required",
+        "Please enter a valid Employee ID to proceed.",
+      );
       return;
     }
 
-    // 2. Search logic
-    const employee = EMPLOYEES.find((emp) => emp.id === searchId.trim());
+    const employee = EMPLOYEES.find((emp) => emp.id === trimmedId);
 
     if (employee) {
-      // 3. Navigate if valid
       navigation.navigate("profile", { data: employee });
     } else {
-      // 4. Alert if invalid
       Alert.alert(
-        "Not Found",
-        "The user does not exist or you entered an invalid ID.",
+        "Verification Failed",
+        "No employee found with this ID. Please check the ID and try again.",
       );
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Find Employee</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.inner}>
+          {/* Back Button (Optional) */}
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={24} color="#333" />
+          </TouchableOpacity>
 
-      <View style={styles.searchBox}>
-        <Ionicons name="search" size={20} color="#666" style={styles.icon} />
-        <TextInput
-          placeholder="Enter Employee ID (e.g., 101)"
-          style={styles.input}
-          value={searchId}
-          onChangeText={setSearchId}
-          keyboardType="numeric"
-          autoFocus={true}
-        />
-      </View>
+          <View style={styles.headerContainer}>
+            <Text style={styles.title}>Verify Identity</Text>
+            <Text style={styles.subtitle}>
+              Enter the unique employee identification number to view profile
+              details.
+            </Text>
+          </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleSearch}>
-        <Text style={styles.buttonText}>Verify Identity</Text>
-      </TouchableOpacity>
-    </View>
+          <View style={[styles.inputWrapper, isFocused && styles.inputFocused]}>
+            <Ionicons
+              name="id-card-outline"
+              size={22}
+              color={isFocused ? "#000" : "#999"}
+              style={styles.icon}
+            />
+            <TextInput
+              placeholder="Employee ID (e.g. 101)"
+              placeholderTextColor="#999"
+              style={styles.input}
+              value={searchId}
+              onChangeText={setSearchId}
+              keyboardType="numeric"
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              autoFocus={true}
+              returnKeyType="search"
+              onSubmitEditing={handleSearch}
+            />
+          </View>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={styles.button}
+            onPress={handleSearch}
+          >
+            <Text style={styles.buttonText}>Search Records</Text>
+            <Ionicons name="chevron-forward" size={18} color="white" />
+          </TouchableOpacity>
+
+          {/* Quick Info / Security Note */}
+          <View style={styles.infoBox}>
+            <Ionicons name="lock-closed-outline" size={14} color="#666" />
+            <Text style={styles.infoText}>
+              All verification attempts are logged for security purposes.
+            </Text>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#eeeeeeff",
-    padding: 20,
-    paddingTop: 55,
-    // justifyContent: "center",
+    backgroundColor: "#F8F9FA",
   },
-  header: {
-    fontSize: 28,
-    fontWeight: "bold",
-    textAlign: "center",
+  inner: {
+    flex: 1,
+    padding: 24,
+    justifyContent: "center",
+  },
+  backBtn: {
+    position: "absolute",
+    top: 60,
+    left: 20,
+  },
+  headerContainer: {
     marginBottom: 40,
-    color: "#333",
   },
-  searchBox: {
+  title: {
+    fontSize: 32,
+    fontWeight: "800",
+    color: "#1A1A1A",
+    marginBottom: 10,
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    lineHeight: 22,
+  },
+  inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f2f2f2",
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    height: 60,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    height: 64,
+    borderWidth: 1.5,
+    borderColor: "#EAEAEA",
+    // Subtle shadow for iOS
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    // Elevation for Android
+    elevation: 2,
+  },
+  inputFocused: {
+    borderColor: "#000",
+    backgroundColor: "#FFF",
   },
   icon: {
-    marginRight: 10,
+    marginRight: 12,
   },
   input: {
     flex: 1,
     fontSize: 18,
+    fontWeight: "500",
     color: "#000",
   },
   button: {
-    backgroundColor: "black",
+    flexDirection: "row",
+    backgroundColor: "#000",
     height: 60,
-    borderRadius: 15,
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 24,
+    gap: 8,
   },
   buttonText: {
     color: "white",
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: "600",
+  },
+  infoBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 30,
+    gap: 6,
+  },
+  infoText: {
+    fontSize: 12,
+    color: "#888",
+    textAlign: "center",
   },
 });

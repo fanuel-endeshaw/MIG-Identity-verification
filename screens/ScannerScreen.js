@@ -2,11 +2,10 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
 export default function ScannerScreen() {
   const [permission, requestPermission] = useCameraPermissions();
-  const [lastScan, setLastScan] = useState(null);
   const [scanned, setScanned] = useState(false);
   const navigation = useNavigation();
 
@@ -17,11 +16,7 @@ export default function ScannerScreen() {
   const handleScan = ({ data }) => {
     if (scanned) return;
     setScanned(true);
-    // setLastScan(data);
-    console.log(typeof data);
-
     navigation.navigate("profile", { data: JSON.parse(data) });
-
     setTimeout(() => setScanned(false), 2000);
   };
 
@@ -32,24 +27,38 @@ export default function ScannerScreen() {
     <View style={styles.container}>
       <CameraView
         style={StyleSheet.absoluteFillObject}
-        barcodeScannerSettings={{
-          barcodeTypes: ["qr"],
-        }}
+        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
         onBarcodeScanned={handleScan}
       />
 
-      {/* Overlay */}
-      <View style={styles.overlay} />
+      {/* Gradient Overlay */}
+      <LinearGradient
+        colors={["rgba(0,0,0,0.7)", "rgba(0,0,0,0.3)"]}
+        style={styles.overlay}
+      />
+
+      {/* Sleek Header */}
       <View style={styles.header}>
-        <Image
-          style={{ height: 70, width: 70 }}
-          source={require("../assets/logo-full.png")}
-          resizeMode="contain"
-        ></Image>
-        <Text style={{ fontSize: 21, fontWeight: "bold" }}>
-          Mig Identity Verification
-        </Text>
+        {/* <LinearGradient
+          colors={["#0072FF", "#00C6FF"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.headerGradient}
+        > */}
+        <View style={styles.headerGradient}>
+          <Image
+            style={styles.logo}
+            source={require("../assets/logo-full.png")}
+            resizeMode="contain"
+          />
+          <View style={styles.headerTextBox}>
+            <Text style={styles.headerTitle}>Mig Identity</Text>
+            <Text style={styles.headerSubtitle}>Verification Scanner</Text>
+          </View>
+        </View>
+        {/* </LinearGradient> */}
       </View>
+
       {/* Scanner Frame */}
       <View style={styles.frame}>
         <View style={styles.cornerTL} />
@@ -58,141 +67,129 @@ export default function ScannerScreen() {
         <View style={styles.cornerBR} />
       </View>
 
-      <Text style={styles.instruction}>
-        Center the QR code within the frame
-      </Text>
-
-      {/* {lastScan && (
-        <View style={styles.resultBox}>
-          <Text style={styles.resultText}>LAST SCANNED</Text>
-          <Text numberOfLines={1} style={styles.link}>
-            {lastScan}
-          </Text>
-        </View>
-      )} */}
+      {/* Instruction */}
+      <View style={styles.instructionBox}>
+        <Text style={styles.instruction}>
+          Center the QR code within the frame
+        </Text>
+      </View>
 
       {/* Bottom Buttons */}
-      <View style={styles.bottomContainer}>
-        {/* <TouchableOpacity style={styles.smallBtn}>
+      {/* <View style={styles.bottomContainer}>
+        <TouchableOpacity style={styles.smallBtn}>
           <Text style={styles.btnText}>Gallery</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
 
-        {/* <TouchableOpacity style={styles.scanBtn}>
+        <TouchableOpacity style={styles.scanBtn}>
           <LinearGradient
             colors={["#00C6FF", "#0072FF"]}
             style={styles.scanInner}
           >
             <Text style={styles.scanText}>Scan</Text>
           </LinearGradient>
-        </TouchableOpacity> */}
-      </View>
+        </TouchableOpacity>
+      </View> */}
     </View>
   );
 }
+
 const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "black" },
+
+  overlay: { ...StyleSheet.absoluteFillObject },
+
   header: {
-    width: "94%",
     width: "100%",
     height: 100,
-    backgroundColor: "white",
     position: "absolute",
-    // top: 26,
     top: 0,
-    alignItems: "center",
-    alignSelf: "center",
-    borderRadius: 7,
-    justifyContent: "center",
-    flexDirection: "row",
-    gap: 10,
-    paddingTop: 20,
-    // left: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 6,
   },
-  container: {
+  headerGradient: {
     flex: 1,
-    backgroundColor: "black",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    borderRadius: 20,
+    backgroundColor: "white",
   },
-
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.6)",
+  logo: { height: 60, width: 60, marginRight: 12 },
+  headerTextBox: { flexDirection: "column", alignItems: "flex-start" },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: "#000000ff" },
+  headerSubtitle: {
+    fontSize: 14,
+    fontWeight: "400",
+    color: "hsla(0, 0%, 16%, 0.85)",
   },
 
   frame: {
     position: "absolute",
     top: "30%",
     alignSelf: "center",
-    width: 250,
-    height: 250,
+    width: 260,
+    height: 260,
   },
-
   cornerTL: {
     position: "absolute",
     top: 0,
     left: 0,
-    width: 30,
-    height: 30,
+    width: 35,
+    height: 35,
     borderTopWidth: 3,
     borderLeftWidth: 3,
     borderColor: "#00FFD1",
+    borderRadius: 8,
   },
   cornerTR: {
     position: "absolute",
     top: 0,
     right: 0,
-    width: 30,
-    height: 30,
+    width: 35,
+    height: 35,
     borderTopWidth: 3,
     borderRightWidth: 3,
     borderColor: "#00FFD1",
+    borderRadius: 8,
   },
   cornerBL: {
     position: "absolute",
     bottom: 0,
     left: 0,
-    width: 30,
-    height: 30,
+    width: 35,
+    height: 35,
     borderBottomWidth: 3,
     borderLeftWidth: 3,
     borderColor: "#00FFD1",
+    borderRadius: 8,
   },
   cornerBR: {
     position: "absolute",
     bottom: 0,
     right: 0,
-    width: 30,
-    height: 30,
+    width: 35,
+    height: 35,
     borderBottomWidth: 3,
     borderRightWidth: 3,
     borderColor: "#00FFD1",
+    borderRadius: 8,
   },
 
-  instruction: {
+  instructionBox: {
     position: "absolute",
-    top: "60%",
+    top: "65%",
     alignSelf: "center",
-    color: "#ccc",
-    fontSize: 14,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
-
-  resultBox: {
-    position: "absolute",
-    bottom: 120,
-    alignSelf: "center",
-    backgroundColor: "#111",
-    padding: 10,
-    borderRadius: 10,
-    width: "80%",
-  },
-
-  resultText: {
-    color: "#aaa",
-    fontSize: 10,
-  },
-
-  link: {
-    color: "#00FFD1",
-    fontSize: 12,
-  },
+  instruction: { color: "#fff", fontSize: 15, fontWeight: "500" },
 
   bottomContainer: {
     position: "absolute",
@@ -202,30 +199,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
   },
-
   smallBtn: {
     backgroundColor: "#222",
-    padding: 10,
-    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
   },
+  btnText: { color: "#fff", fontSize: 14 },
 
-  btnText: {
-    color: "#fff",
-  },
-
-  scanBtn: {
-    borderRadius: 50,
-    overflow: "hidden",
-  },
-
-  scanInner: {
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 50,
-  },
-
-  scanText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
+  scanBtn: { borderRadius: 50, overflow: "hidden" },
+  scanInner: { paddingVertical: 15, paddingHorizontal: 50, borderRadius: 50 },
+  scanText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
 });

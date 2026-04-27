@@ -1,5 +1,3 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import React from "react";
 import {
   View,
@@ -8,8 +6,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  ScrollView,
+  StatusBar,
 } from "react-native";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+
 export default function ProfileScreen() {
   const route = useRoute();
   const { data } = route.params;
@@ -17,40 +19,112 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header Section */}
+      <StatusBar barStyle="dark-content" />
+
+      {/* Header */}
       <View style={styles.headerRow}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          // hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          style={styles.closeButton}
         >
-          <MaterialIcons name="cancel" size={27} color="black" />
+          <Ionicons name="close" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Identity Check System</Text>
+        <Text style={styles.headerText}>Identity Verified</Text>
+        <View style={{ width: 40 }} />
       </View>
 
-      {/* Profile Card */}
-      <View style={styles.card}>
-        <Image
-          resizeMode="cover"
-          source={{ uri: data.photo }}
-          style={styles.avatar}
-        />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 40 }}
+      >
+        {/* Profile Card */}
+        <View style={styles.card}>
+          <View style={styles.imageContainer}>
+            <Image
+              resizeMode="cover"
+              source={{ uri: data.photo }}
+              style={styles.avatar}
+            />
+            <View style={styles.verifiedBadge}>
+              <MaterialCommunityIcons
+                name="check-decagram"
+                size={20}
+                color="#00FFD1"
+              />
+              <Text style={styles.verifiedText}>VERIFIED</Text>
+            </View>
+          </View>
 
-        <View style={styles.infoContainer}>
-          <DetailItem label="Full Name" value={data.name} />
-          <DetailItem label="ID Number" value={data.id || "101"} />
-          <DetailItem label="Date of Birth" value={data.dob || "2003-07-22"} />
-          <DetailItem label="Address" value={data.address} />
+          <View style={styles.content}>
+            <Text style={styles.sectionTitle}>Employee Details</Text>
+
+            <DetailItem
+              label="Full Name"
+              value={data.name}
+              icon="person-outline"
+            />
+
+            <View style={styles.row}>
+              <View style={{ flex: 1 }}>
+                <DetailItem
+                  label="ID Number"
+                  value={data.id || "101"}
+                  icon="finger-print"
+                />
+              </View>
+              {/* <View style={{ flex: 1 }}>
+                <DetailItem
+                  label="Status"
+                  value="Active"
+                  icon="ellipse"
+                  iconColor="#4CAF50"
+                />
+              </View> */}
+            </View>
+
+            <DetailItem
+              label="Date of Birth"
+              value={data.dob || "July 22, 2003"}
+              icon="calendar-outline"
+            />
+
+            <DetailItem
+              label="Primary Address"
+              value={data.address}
+              icon="location-outline"
+            />
+
+            {/* <DetailItem
+              label="Phone Number"
+              value={data.phone || "N/A"}
+              icon="call-outline"
+            /> */}
+          </View>
         </View>
-      </View>
+
+        {/* Action Button */}
+        <TouchableOpacity
+          style={styles.doneButton}
+          onPress={() => navigation.navigate("scanner")}
+        >
+          <Text style={styles.doneButtonText}>Done</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
-// Reusable component for clean data rows
-const DetailItem = ({ label, value }) => (
+const DetailItem = ({ label, value, icon, iconColor = "#666" }) => (
   <View style={styles.detailRow}>
-    <Text style={styles.label}>{label}</Text>
+    <View style={styles.labelRow}>
+      <Ionicons
+        name={icon}
+        size={14}
+        color={iconColor}
+        style={{ marginRight: 6 }}
+      />
+      <Text style={styles.label}>{label}</Text>
+    </View>
     <Text style={styles.value}>{value}</Text>
   </View>
 );
@@ -58,64 +132,119 @@ const DetailItem = ({ label, value }) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
-    paddingTop: 25,
+    backgroundColor: "#F2F4F7",
+    paddingTop: 20,
   },
   headerRow: {
-    height: 60,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
-    marginBottom: 10,
-    // backgroundColor: "white",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    height: 60,
+    paddingTop: 10,
+    // paddingBottom: 15,
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
   headerText: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700",
-    marginLeft: 15,
-    color: "#1A1A1A",
-    fontFamily: "System", // Cleanest default font
+    color: "#111827",
   },
   card: {
     alignSelf: "center",
     width: "92%",
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 16,
-    // Subtle shadow for modern depth
+    borderRadius: 32,
+    overflow: "hidden",
+    marginTop: 10,
+    // Soft Elevation
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.05,
+    shadowRadius: 20,
+    elevation: 5,
+  },
+  imageContainer: {
+    position: "relative",
   },
   avatar: {
     width: "100%",
-    height: 240,
-    borderRadius: 16, // Softer corners
+    height: 280,
+    backgroundColor: "#f0f0f0",
+  },
+  verifiedBadge: {
+    position: "absolute",
+    bottom: 16,
+    right: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backdropFilter: "blur(10px)",
+  },
+  verifiedText: {
+    color: "#00FFD1",
+    fontSize: 10,
+    fontWeight: "800",
+    marginLeft: 4,
+    letterSpacing: 1,
+  },
+  content: {
+    padding: 24,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#9CA3AF",
+    textTransform: "uppercase",
+    letterSpacing: 1.5,
     marginBottom: 20,
   },
-  infoContainer: {
-    paddingHorizontal: 4,
+  row: {
+    flexDirection: "row",
+    gap: 15,
   },
   detailRow: {
-    marginBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0", // Subtle separator
-    paddingBottom: 8,
+    marginBottom: 20,
+  },
+  labelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
   },
   label: {
     fontSize: 12,
-    color: "#6C757D", // Secondary color for label
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginBottom: 4,
-    fontFamily: "System",
+    color: "#6B7280",
+    fontWeight: "500",
   },
   value: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "600",
-    color: "#212529",
-    fontFamily: "System",
+    color: "#111827",
+  },
+  doneButton: {
+    marginTop: 25,
+    marginHorizontal: 20,
+    backgroundColor: "#000",
+    height: 56,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  doneButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
   },
 });
