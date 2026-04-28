@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  Platform,
+  StatusBar,
+} from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
@@ -7,17 +16,64 @@ import { useNavigation } from "@react-navigation/native";
 export default function ScannerScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
+  const [loading, setLoading] = useState(false); // To show a loader during API call
   const navigation = useNavigation();
 
   useEffect(() => {
     if (!permission) requestPermission();
   }, []);
 
-  const handleScan = ({ data }) => {
-    if (scanned) return;
-    setScanned(true);
-    navigation.navigate("profile", { data: JSON.parse(data) });
-    setTimeout(() => setScanned(false), 2000);
+  const handleScan = async ({ data }) => {
+    if (scanned || loading) return;
+
+    // 1. Validate: 8-digit integer check
+    const isValidToken = /^\d{8}$/.test(data);
+
+    if (isValidToken) {
+      setLoading(true);
+      setScanned(true);
+
+      try {
+        console.log("started try");
+        console.log(data);
+        console.log(typeof data);
+
+        // 2. API Call to your backend
+        const response = await fetch(
+          `http://192.168.1.65:5000/api/users/verify?token=${data}`,
+        );
+
+        if (response.ok) {
+          console.log("ok");
+
+          const userData = await response.json();
+          // 3. Navigate to profile with the fetched user object
+          navigation.navigate("profile", { data: userData });
+        } else {
+          // Handle backend errors (e.g., 404 User Not Found)
+          console.log("error");
+
+          navigation.navigate("error", {
+            details: "User not found in the Mig Identity database.",
+          });
+        }
+      } catch (error) {
+        // Handle network errors
+        navigation.navigate("error", {
+          details: "Network error. Please check your connection.",
+        });
+      } finally {
+        setLoading(false);
+        // Reset scanner after a delay to allow for the next scan if they come back
+        setTimeout(() => setScanned(false), 2000);
+      }
+    } else {
+      // 4. Invalid token format (not 8 digits or not integer)
+      navigation.navigate("error", {
+        details:
+          "Invalid QR Format. Please scan a valid QR code or Try to use ID verification .",
+      });
+    }
   };
 
   if (!permission) return <Text>Requesting permission...</Text>;
@@ -31,20 +87,12 @@ export default function ScannerScreen() {
         onBarcodeScanned={handleScan}
       />
 
-      {/* Gradient Overlay */}
       <LinearGradient
         colors={["rgba(0,0,0,0.7)", "rgba(0,0,0,0.3)"]}
         style={styles.overlay}
       />
 
-      {/* Sleek Header */}
       <View style={styles.header}>
-        {/* <LinearGradient
-          colors={["#0072FF", "#00C6FF"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.headerGradient}
-        > */}
         <View style={styles.headerGradient}>
           <Image
             style={styles.logo}
@@ -56,84 +104,71 @@ export default function ScannerScreen() {
             <Text style={styles.headerSubtitle}>Verification Scanner</Text>
           </View>
         </View>
-        {/* </LinearGradient> */}
       </View>
 
-      {/* Scanner Frame */}
       <View style={styles.frame}>
         <View style={styles.cornerTL} />
         <View style={styles.cornerTR} />
         <View style={styles.cornerBL} />
         <View style={styles.cornerBR} />
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color="#00FFD1" />
+          </View>
+        )}
       </View>
 
-      {/* Instruction */}
       <View style={styles.instructionBox}>
         <Text style={styles.instruction}>
-          Center the QR code within the frame
+          {loading ? "Verifying..." : "Center the QR code within the frame"}
         </Text>
       </View>
-
-      {/* Bottom Buttons */}
-      {/* <View style={styles.bottomContainer}>
-        <TouchableOpacity style={styles.smallBtn}>
-          <Text style={styles.btnText}>Gallery</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.scanBtn}>
-          <LinearGradient
-            colors={["#00C6FF", "#0072FF"]}
-            style={styles.scanInner}
-          >
-            <Text style={styles.scanText}>Scan</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View> */}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "black" },
-
   overlay: { ...StyleSheet.absoluteFillObject },
-
   header: {
     width: "100%",
-    height: 100,
+    // Handle Android Status Bar overlap
+    // paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     position: "absolute",
     top: 0,
-    shadowColor: "#000",
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 6,
+    zIndex: 10,
   },
   headerGradient: {
-    flex: 1,
+    height: 100,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-    borderRadius: 20,
     backgroundColor: "white",
   },
   logo: { height: 60, width: 60, marginRight: 12 },
   headerTextBox: { flexDirection: "column", alignItems: "flex-start" },
-  headerTitle: { fontSize: 20, fontWeight: "700", color: "#000000ff" },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: "#000" },
   headerSubtitle: {
     fontSize: 14,
     fontWeight: "400",
-    color: "hsla(0, 0%, 16%, 0.85)",
+    color: "rgba(0,0,0,0.6)",
   },
-
   frame: {
     position: "absolute",
     top: "30%",
     alignSelf: "center",
     width: 260,
     height: 260,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingOverlay: {
+    backgroundColor: "rgba(0,0,0,0.4)",
+    padding: 20,
+    borderRadius: 15,
   },
   cornerTL: {
     position: "absolute",
@@ -179,7 +214,6 @@ const styles = StyleSheet.create({
     borderColor: "#00FFD1",
     borderRadius: 8,
   },
-
   instructionBox: {
     position: "absolute",
     top: "65%",
@@ -190,24 +224,4 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   instruction: { color: "#fff", fontSize: 15, fontWeight: "500" },
-
-  bottomContainer: {
-    position: "absolute",
-    bottom: 40,
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-  },
-  smallBtn: {
-    backgroundColor: "#222",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-  },
-  btnText: { color: "#fff", fontSize: 14 },
-
-  scanBtn: { borderRadius: 50, overflow: "hidden" },
-  scanInner: { paddingVertical: 15, paddingHorizontal: 50, borderRadius: 50 },
-  scanText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
 });

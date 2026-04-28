@@ -5,6 +5,7 @@ import ScannerScreen from "./screens/ScannerScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import { createStackNavigator } from "@react-navigation/stack";
 import BottomNavigation from "./navigation/BottomNavigation";
+import QrErrorPage from "./screens/QrErrorPage";
 const stack = createStackNavigator();
 const App = () => {
   //   const navigation = useNavigation();
@@ -20,6 +21,11 @@ const App = () => {
           options={{ headerShown: false }}
           name="profile"
           component={ProfileScreen}
+        />
+        <stack.Screen
+          options={{ headerShown: false }}
+          name="error"
+          component={QrErrorPage}
         />
       </stack.Navigator>
     </NavigationContainer>
