@@ -10,52 +10,66 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator, // Added for loading state
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
-const EMPLOYEES = [
-  {
-    id: "101",
-    name: "Fanuel En",
-    address: "Bole, Addis Ababa",
-    phone: "+251900000000",
-    photo:
-      "https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?q=80&w=387&auto=format&fit=crop",
-  },
-  {
-    id: "102",
-    name: "Abrham",
-    address: "Bole, Addis Ababa",
-    phone: "+251911111111",
-    photo: "https://njaes.rutgers.edu/fs1325/FS1325-1-big.jpg",
-  },
-];
-
 export default function Search() {
   const [searchId, setSearchId] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const [loading, setLoading] = useState(false); // New state
   const navigation = useNavigation();
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     const trimmedId = searchId.trim();
+
+    // 1. Basic empty check
     if (!trimmedId) {
+      Alert.alert("Input Required", "Please enter an Employee ID.");
+      return;
+    }
+
+    // 2. Validate: Must be exactly 8 digits and numeric
+    const isValidId = /^\d{8}$/.test(trimmedId);
+    if (!isValidId) {
       Alert.alert(
-        "Input Required",
-        "Please enter a valid Employee ID to proceed.",
+        "Invalid Format",
+        "Employee IDs must be exactly 8 digits long (e.g., 40133847).",
       );
       return;
     }
 
-    const employee = EMPLOYEES.find((emp) => emp.id === trimmedId);
+    setLoading(true);
 
-    if (employee) {
-      navigation.navigate("profile", { data: employee });
-    } else {
-      Alert.alert(
-        "Verification Failed",
-        "No employee found with this ID. Please check the ID and try again.",
+    try {
+      console.log("Starting engi");
+
+      // 3. API Call (Replace localhost with your machine's IP)
+      // Example: http://192.168.1.5:5000/v1/user?token=...
+      const response = await fetch(
+        `http://192.168.1.65:5000/api/users/verify?token=${trimmedId}`,
       );
+
+      if (response.ok) {
+        console.log(response);
+
+        const userData = await response.json();
+        Keyboard.dismiss();
+        navigation.navigate("profile", { data: userData });
+      } else {
+        // Navigate to your custom error page or show alert
+        navigation.navigate("error", {
+          details: "No employee found with this ID in the Mig database.",
+        });
+      }
+    } catch (error) {
+      Alert.alert(
+        "Connection Error",
+        "Could not reach the server. Please check your internet.",
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,7 +80,9 @@ export default function Search() {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.inner}>
-          {/* Back Button (Optional) */}
+          {/* Status Bar Padding for Android */}
+          <View style={styles.androidPadding} />
+
           <TouchableOpacity
             style={styles.backBtn}
             onPress={() => navigation.goBack()}
@@ -77,8 +93,8 @@ export default function Search() {
           <View style={styles.headerContainer}>
             <Text style={styles.title}>Verify Identity</Text>
             <Text style={styles.subtitle}>
-              Enter the unique employee identification number to view profile
-              details.
+              Enter the 8-digit unique employee identification number to view
+              profile details.
             </Text>
           </View>
 
@@ -90,30 +106,37 @@ export default function Search() {
               style={styles.icon}
             />
             <TextInput
-              placeholder="Employee ID (e.g. 101)"
+              placeholder="e.g. 40133847"
               placeholderTextColor="#999"
               style={styles.input}
               value={searchId}
               onChangeText={setSearchId}
               keyboardType="numeric"
+              maxLength={8} // Limit input length
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              autoFocus={true}
               returnKeyType="search"
               onSubmitEditing={handleSearch}
+              editable={!loading} // Disable input while loading
             />
           </View>
 
           <TouchableOpacity
             activeOpacity={0.8}
-            style={styles.button}
+            style={[styles.button, loading && { backgroundColor: "#444" }]}
             onPress={handleSearch}
+            disabled={loading}
           >
-            <Text style={styles.buttonText}>Search Records</Text>
-            <Ionicons name="chevron-forward" size={18} color="white" />
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <>
+                <Text style={styles.buttonText}>Search Records</Text>
+                <Ionicons name="chevron-forward" size={18} color="white" />
+              </>
+            )}
           </TouchableOpacity>
 
-          {/* Quick Info / Security Note */}
           <View style={styles.infoBox}>
             <Ionicons name="lock-closed-outline" size={14} color="#666" />
             <Text style={styles.infoText}>
@@ -127,23 +150,18 @@ export default function Search() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F8F9FA",
+  // ... existing styles ...
+  androidPadding: {
+    height: Platform.OS === "android" ? 40 : 0,
   },
-  inner: {
-    flex: 1,
-    padding: 24,
-    justifyContent: "center",
-  },
+  container: { flex: 1, backgroundColor: "#F8F9FA" },
+  inner: { flex: 1, padding: 24, justifyContent: "center" },
   backBtn: {
     position: "absolute",
-    top: 60,
+    top: Platform.OS === "android" ? 50 : 60,
     left: 20,
   },
-  headerContainer: {
-    marginBottom: 40,
-  },
+  headerContainer: { marginBottom: 40 },
   title: {
     fontSize: 32,
     fontWeight: "800",
@@ -151,11 +169,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     letterSpacing: -0.5,
   },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
-    lineHeight: 22,
-  },
+  subtitle: { fontSize: 16, color: "#666", lineHeight: 22 },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -165,27 +179,10 @@ const styles = StyleSheet.create({
     height: 64,
     borderWidth: 1.5,
     borderColor: "#EAEAEA",
-    // Subtle shadow for iOS
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    // Elevation for Android
-    elevation: 2,
   },
-  inputFocused: {
-    borderColor: "#000",
-    backgroundColor: "#FFF",
-  },
-  icon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: "500",
-    color: "#000",
-  },
+  inputFocused: { borderColor: "#000", backgroundColor: "#FFF" },
+  icon: { marginRight: 12 },
+  input: { flex: 1, fontSize: 18, fontWeight: "500", color: "#000" },
   button: {
     flexDirection: "row",
     backgroundColor: "#000",
@@ -196,11 +193,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     gap: 8,
   },
-  buttonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
-  },
+  buttonText: { color: "white", fontSize: 18, fontWeight: "600" },
   infoBox: {
     flexDirection: "row",
     alignItems: "center",
@@ -208,9 +201,5 @@ const styles = StyleSheet.create({
     marginTop: 30,
     gap: 6,
   },
-  infoText: {
-    fontSize: 12,
-    color: "#888",
-    textAlign: "center",
-  },
+  infoText: { fontSize: 12, color: "#888", textAlign: "center" },
 });

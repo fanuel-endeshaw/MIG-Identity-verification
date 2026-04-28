@@ -47,6 +47,8 @@ export default function ScannerScreen() {
           console.log("ok");
 
           const userData = await response.json();
+          console.log(userData);
+
           // 3. Navigate to profile with the fetched user object
           navigation.navigate("profile", { data: userData });
         } else {

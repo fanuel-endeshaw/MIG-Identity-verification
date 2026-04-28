@@ -16,6 +16,11 @@ export default function ProfileScreen() {
   const route = useRoute();
   const { data } = route.params;
   const navigation = useNavigation();
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0]; // Result: 1995-05-09
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -42,7 +47,10 @@ export default function ProfileScreen() {
           <View style={styles.imageContainer}>
             <Image
               resizeMode="cover"
-              source={{ uri: data.photo }}
+              source={{
+                uri: "http://192.168.1.65:5000/uploads/1777359160688-laptop_girl.jpeg",
+              }}
+              // source={{ uri: data.photo_url }}
               style={styles.avatar}
             />
             <View style={styles.verifiedBadge}>
@@ -60,7 +68,7 @@ export default function ProfileScreen() {
 
             <DetailItem
               label="Full Name"
-              value={data.name}
+              value={data.full_name}
               icon="person-outline"
             />
 
@@ -68,7 +76,7 @@ export default function ProfileScreen() {
               <View style={{ flex: 1 }}>
                 <DetailItem
                   label="ID Number"
-                  value={data.id || "101"}
+                  value={data.id_number || "101"}
                   icon="finger-print"
                 />
               </View>
@@ -84,7 +92,7 @@ export default function ProfileScreen() {
 
             <DetailItem
               label="Date of Birth"
-              value={data.dob || "July 22, 2003"}
+              value={formatDate(data.date_of_birth) || "July 22, 2003"}
               icon="calendar-outline"
             />
 
