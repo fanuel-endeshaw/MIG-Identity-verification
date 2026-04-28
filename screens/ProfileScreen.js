@@ -47,10 +47,7 @@ export default function ProfileScreen() {
           <View style={styles.imageContainer}>
             <Image
               resizeMode="cover"
-              source={{
-                uri: "http://192.168.1.65:5000/uploads/1777359160688-laptop_girl.jpeg",
-              }}
-              // source={{ uri: data.photo_url }}
+              source={{ uri: data.photo_url }}
               style={styles.avatar}
             />
             <View style={styles.verifiedBadge}>
