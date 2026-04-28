@@ -99,7 +99,7 @@ export default function ScannerScreen() {
           <Image
             style={styles.logo}
             source={require("../assets/logo-full.png")}
-            resizeMode="contain"
+            resizeMode="stretch"
           />
           <View style={styles.headerTextBox}>
             <Text style={styles.headerTitle}>Mig Identity</Text>
@@ -149,8 +149,9 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     backgroundColor: "white",
+    // paddingTop: 30,
   },
-  logo: { height: 60, width: 60, marginRight: 12 },
+  logo: { height: 75, width: 130, marginRight: 12 },
   headerTextBox: { flexDirection: "column", alignItems: "flex-start" },
   headerTitle: { fontSize: 20, fontWeight: "700", color: "#000" },
   headerSubtitle: {

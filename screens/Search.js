@@ -56,6 +56,7 @@ export default function Search() {
 
         const userData = await response.json();
         Keyboard.dismiss();
+        setSearchId("");
         navigation.navigate("profile", { data: userData });
       } else {
         // Navigate to your custom error page or show alert
