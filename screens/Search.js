@@ -48,7 +48,7 @@ export default function Search() {
       // 3. API Call (Replace localhost with your machine's IP)
       // Example: http://192.168.1.5:5000/v1/user?token=...
       const response = await fetch(
-        `http://192.168.1.65:5000/api/users/verify?token=${trimmedId}`,
+        `http://192.168.1.39:5000/api/users/verify?token=${trimmedId}`,
       );
 
       if (response.ok) {
@@ -83,7 +83,6 @@ export default function Search() {
         <View style={styles.inner}>
           {/* Status Bar Padding for Android */}
           <View style={styles.androidPadding} />
-
           <TouchableOpacity
             style={styles.backBtn}
             onPress={() => navigation.goBack()}
@@ -151,7 +150,6 @@ export default function Search() {
 }
 
 const styles = StyleSheet.create({
-  // ... existing styles ...
   androidPadding: {
     height: Platform.OS === "android" ? 40 : 0,
   },

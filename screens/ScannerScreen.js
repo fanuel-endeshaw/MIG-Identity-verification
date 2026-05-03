@@ -40,7 +40,7 @@ export default function ScannerScreen() {
 
         // 2. API Call to your backend
         const response = await fetch(
-          `http://192.168.1.65:5000/api/users/verify?token=${data}`,
+          `http://192.168.1.56:5000/api/users/verify?token=${data}`,
         );
 
         if (response.ok) {
@@ -149,13 +149,15 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     backgroundColor: "white",
-    // paddingTop: 30,
+    paddingTop: 30,
+    paddingBottom: 10,
+    gap: 12,
   },
-  logo: { height: 75, width: 130, marginRight: 12 },
+  logo: { height: 75, width: 150, marginRight: 12 },
   headerTextBox: { flexDirection: "column", alignItems: "flex-start" },
   headerTitle: { fontSize: 20, fontWeight: "700", color: "#000" },
   headerSubtitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "400",
     color: "rgba(0,0,0,0.6)",
   },
