@@ -8,59 +8,57 @@ import {
   Linking,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+// import { CameraView, useCameraPermissions } from "expo-camera";
 
-export default function NoPermissionScreen({ onRequestPermission, onGoBack }) {
+export default function NoPermissionScreen({
+  permission,
+  requestPermission,
+  onGoBack,
+}) {
+  const handlePermission = async () => {
+    if (permission?.canAskAgain) {
+      await requestPermission();
+    } else {
+      Linking.openSettings(); // 🔥 fallback when blocked
+    }
+  };
+
+  const isBlocked = permission && !permission.canAskAgain;
+
   return (
     <View style={styles.container}>
-      {/* Background Gradient */}
       <LinearGradient
         colors={["#000000", "#0f2027"]}
         style={StyleSheet.absoluteFillObject}
       />
 
-      {/* Content */}
       <View style={styles.content}>
-        {/* Optional Image */}
-        <Image
-          source={require("../assets/no-camera.png")} // replace if needed
-          style={styles.image}
-          resizeMode="contain"
-        />
-
         <Text style={styles.title}>Camera Permission Required</Text>
 
         <Text style={styles.description}>
-          This app needs access to your camera to scan QR codes for identity
-          verification.
+          {isBlocked
+            ? "Camera access is permanently denied. Please enable it from settings."
+            : "We need camera access to scan QR codes."}
         </Text>
 
-        {/* Allow Button */}
         <TouchableOpacity
           style={styles.primaryButton}
-          onPress={onRequestPermission}
+          onPress={handlePermission}
         >
-          <Text style={styles.primaryButtonText}>Allow Camera Access</Text>
+          <Text style={styles.primaryButtonText}>
+            {isBlocked ? "Open Settings" : "Allow Camera Access"}
+          </Text>
         </TouchableOpacity>
 
-        {/* Open Settings */}
-        <TouchableOpacity
-          style={styles.secondaryButton}
-          onPress={() => Linking.openSettings()}
-        >
-          <Text style={styles.secondaryText}>Open Settings</Text>
-        </TouchableOpacity>
-
-        {/* Go Back */}
-        {onGoBack && (
+        {/* {onGoBack && (
           <TouchableOpacity onPress={onGoBack}>
             <Text style={styles.backText}>Go Back</Text>
           </TouchableOpacity>
-        )}
+        )} */}
       </View>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -92,7 +90,8 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   primaryButton: {
-    backgroundColor: "#00FFD1",
+    backgroundColor: "#ffffffff",
+    // backgroundColor: "#00FFD1",
     paddingVertical: 14,
     paddingHorizontal: 30,
     borderRadius: 30,
@@ -109,7 +108,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   secondaryText: {
-    color: "#00FFD1",
+    color: "#1f9bd4ff",
+    // color: "#00FFD1",
     fontSize: 14,
   },
   backText: {
