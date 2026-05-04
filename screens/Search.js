@@ -131,7 +131,7 @@ export default function Search() {
               <ActivityIndicator color="white" />
             ) : (
               <>
-                <Text style={styles.buttonText}>Search Records</Text>
+                <Text style={styles.buttonText}>Check Identity</Text>
                 <Ionicons name="chevron-forward" size={18} color="white" />
               </>
             )}
@@ -140,7 +140,7 @@ export default function Search() {
           <View style={styles.infoBox}>
             <Ionicons name="lock-closed-outline" size={14} color="#666" />
             <Text style={styles.infoText}>
-              All verification attempts are logged for security purposes.
+              All verification attempts are logged .
             </Text>
           </View>
         </View>

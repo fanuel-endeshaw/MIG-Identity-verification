@@ -13,6 +13,7 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import NoPermissionScreen from "./NoPermissionScreen";
+import RequestPermission from "./RequestPermission";
 
 export default function ScannerScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -79,7 +80,7 @@ export default function ScannerScreen() {
     }
   };
 
-  if (!permission) return <Text>Requesting permission...</Text>;
+  if (!permission) return <RequestPermission></RequestPermission>;
   if (!permission.granted)
     return (
       <NoPermissionScreen
