@@ -18,7 +18,7 @@ import RequestPermission from "./RequestPermission";
 export default function ScannerScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
-  const [loading, setLoading] = useState(false); // To show a loader during API call
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function ScannerScreen() {
 
         // 2. API Call to your backend
         const response = await fetch(
-          `http://192.168.1.56:5000/api/users/verify?token=${data}`,
+          `http://192.168.137.232:5000/api/users/verify?token=${data}`,
         );
 
         if (response.ok) {
@@ -51,10 +51,8 @@ export default function ScannerScreen() {
           const userData = await response.json();
           console.log(userData);
 
-          // 3. Navigate to profile with the fetched user object
           navigation.navigate("profile", { data: userData });
         } else {
-          // Handle backend errors (e.g., 404 User Not Found)
           console.log("error");
 
           navigation.navigate("error", {
@@ -62,7 +60,7 @@ export default function ScannerScreen() {
           });
         }
       } catch (error) {
-        // Handle network errors
+        //
         navigation.navigate("error", {
           details: "Network error. Please check your connection.",
         });

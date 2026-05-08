@@ -48,7 +48,7 @@ export default function Search() {
       // 3. API Call (Replace localhost with your machine's IP)
       // Example: http://192.168.1.5:5000/v1/user?token=...
       const response = await fetch(
-        `http://192.168.1.39:5000/api/users/verify?token=${trimmedId}`,
+        `http://192.168.137.232:5000/api/users/verify?token=${trimmedId}`,
       );
 
       if (response.ok) {
