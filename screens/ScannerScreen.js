@@ -162,9 +162,14 @@ const styles = StyleSheet.create({
   },
   logo: { height: 75, width: 150, marginRight: 12 },
   headerTextBox: { flexDirection: "column", alignItems: "flex-start" },
-  headerTitle: { fontSize: 20, fontWeight: "700", color: "#000" },
+  headerTitle: {
+    color: "#000",
+    fontSize: 29,
+    fontWeight: "800",
+    color: "#1A1A1A",
+  },
   headerSubtitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "400",
     color: "rgba(0,0,0,0.6)",
   },

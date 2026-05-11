@@ -14,7 +14,7 @@ const App = () => {
       <stack.Navigator screenOptions={{ animation: "fade_from_bottom" }}>
         <stack.Screen
           options={{ title: "Mig Identity Verification", headerShown: false }}
-          name="scanner"
+          name="scannerAndProfile"
           component={BottomNavigation}
         />
         <stack.Screen
