@@ -1,4 +1,3 @@
-import React from "react";
 import {
   View,
   Text,
@@ -21,9 +20,12 @@ export default function ProfileScreen() {
     const date = new Date(dateString);
     return date.toISOString().split("T")[0]; // Result: 1995-05-09
   };
+  console.log("****************************");
+  console.log(data.photo_url);
+  console.log("****************************");
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
       {/* Header */}
@@ -47,8 +49,13 @@ export default function ProfileScreen() {
           <View style={styles.imageContainer}>
             <Image
               resizeMode="cover"
-              source={{ uri: data.photo_url }}
+              source={{
+                uri: data.photo_url,
+              }}
               style={styles.avatar}
+              onError={(e) => {
+                console.log("IMAGE ERROR:", e.nativeEvent.error);
+              }}
             />
             <View style={styles.verifiedBadge}>
               <MaterialCommunityIcons
@@ -88,14 +95,14 @@ export default function ProfileScreen() {
             </View>
 
             <DetailItem
-              label="Date of Birth"
-              value={formatDate(data.date_of_birth) || "July 22, 2003"}
-              icon="calendar-outline"
+              label="Phone Number"
+              value={data.phone_number || "N/A"}
+              icon="call-outline"
             />
 
             <DetailItem
               label="Primary Address"
-              value={data.address}
+              value={data.address || "N/A"}
               icon="location-outline"
             />
 
@@ -110,12 +117,12 @@ export default function ProfileScreen() {
         {/* Action Button */}
         <TouchableOpacity
           style={styles.doneButton}
-          onPress={() => navigation.navigate("scanner")}
+          onPress={() => navigation.goBack()}
         >
           <Text style={styles.doneButtonText}>Done</Text>
         </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -237,6 +244,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#111827",
+    marginLeft: 7,
   },
   doneButton: {
     marginTop: 25,

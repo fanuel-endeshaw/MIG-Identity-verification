@@ -29,9 +29,10 @@ export default function ScannerScreen() {
     if (scanned || loading) return;
 
     // 1. Validate: 8-digit integer check
-    const isValidToken = /^\d{8}$/.test(data);
+    // const isValidToken = /^\d{8}$/.test(data);
 
-    if (isValidToken) {
+    if (true) {
+      // if (isValidToken) {
       setLoading(true);
       setScanned(true);
 
@@ -42,8 +43,11 @@ export default function ScannerScreen() {
 
         // 2. API Call to your backend
         const response = await fetch(
-          `http://192.168.137.232:5000/api/users/verify?token=${data}`,
+          `http://192.168.1.53:5000/api/users/verify/${data}`,
         );
+        console.log("**************8res");
+        console.log(response);
+        console.log("**************8res");
 
         if (response.ok) {
           console.log("ok");
